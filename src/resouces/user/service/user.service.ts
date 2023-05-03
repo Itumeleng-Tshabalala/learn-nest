@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../repository/users.repository';
 import { User } from '../schemas/user.schema';
+import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class UserService {
@@ -54,5 +55,15 @@ export class UserService {
      */
     async deleteUser(email: string): Promise<boolean> {
         return this.usersRepository.deleteOne({ email });
+    }
+
+    /**
+     * 
+     * @param user 
+     */
+    @OnEvent('user.created')
+    handleOrderCreatedEvent(user: User) {
+        // handle and process "UserCreatedEvent" event
+        console.debug('OnEvent.user.created', user);
     }
 }

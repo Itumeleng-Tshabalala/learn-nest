@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { User } from '../schemas/user.schema';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('users')
 export class UserController {
@@ -9,7 +10,7 @@ export class UserController {
      * 
      * @param usersService 
      */
-    constructor(private readonly usersService: UserService) { }
+    constructor(private readonly usersService: UserService, private eventEmitter: EventEmitter2) { }
 
     /**
      * 
@@ -46,7 +47,9 @@ export class UserController {
     @Post()
     async createUser(@Body() user: User): Promise<User> {
         try {
-            return this.usersService.createUser(user)
+            const createdUser: User = await this.usersService.createUser(user)
+            this.eventEmitter.emit("user.created", createdUser);
+            return createdUser;
         } catch (error) {
             throw new Error(error.message);
         }
