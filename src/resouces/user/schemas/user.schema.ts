@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Document } from 'mongoose';
+import { Status } from "src/shared/enum/status.enum";
 
 export type UserDocument = User & Document;
 
@@ -16,7 +17,7 @@ export class User {
       ],
       unique: true,
     }) email: string;
-    @Prop({ default: "Initiated" ,required: true }) status: string;
+    @Prop({ default: Status.INITIATED ,required: true }) status: string;
     @Prop({ required: true }) externalId: string;
     @Prop({ default: Date.now, required: true }) createdAt: Date;
 }

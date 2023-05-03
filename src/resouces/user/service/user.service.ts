@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../repository/users.repository';
 import { User } from '../schemas/user.schema';
+import { OnEvent } from '@nestjs/event-emitter';
+import { IUser } from 'src/shared/interfaces/user.interface';
+import * as imports from  "../../../shared/interfaces/index.interface";
 
 @Injectable()
-export class UserService {
+export class UserService implements IUser{
 
     /**
      * 
@@ -17,15 +20,15 @@ export class UserService {
      * @returns 
      */
     async getUserByEmail(email: string): Promise<User> {
-        return this.usersRepository.findOne({ email })
+        return this.usersRepository.findOne({ email });
     }
 
     /**
      * 
      * @returns 
      */
-    async getUsers(): Promise<User[]> {
-        return this.usersRepository.find({});
+    async getUsers(limit?: number, offset?: number): Promise<User[]> {
+        return this.usersRepository.find({}, limit, offset);
     }
 
     /**
@@ -54,5 +57,15 @@ export class UserService {
      */
     async deleteUser(email: string): Promise<boolean> {
         return this.usersRepository.deleteOne({ email });
+    }
+
+    /**
+     * 
+     * @param user 
+     */
+    @OnEvent('user.created')
+    handleUserCreatedEvent(user: User) {
+        // handle and process "UserCreatedEvent" event
+        console.debug('OnEvent.user.created', user);
     }
 }
