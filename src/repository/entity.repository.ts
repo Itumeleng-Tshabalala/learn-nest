@@ -15,10 +15,12 @@ export abstract class EntityRepository<T extends Document> {
 
   async find(
     entityFilterQuery: FilterQuery<T>,
+    limit?: number,
+    offset?: number
   ): Promise<T[] | null> {
     return this.entityModel.find(entityFilterQuery, {
       __v: 0
-    });
+    }).limit(limit ?? undefined).skip(offset ?? undefined);
   }
 
   async create(createEntityData: unknown): Promise<T> {

@@ -1,7 +1,8 @@
-import { Body, Controller, Get, Param, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Query } from '@nestjs/common';
 import { UserService } from '../service/user.service';
 import { User } from '../schemas/user.schema';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { UpperFirstPipe } from 'src/shared/pipes/upper-first.pipe';
 
 @Controller('users')
 export class UserController {
@@ -31,9 +32,9 @@ export class UserController {
      * @returns
      */
     @Get()
-    async getUsers(): Promise<User[]> {
+    async getUsers(@Query('limit', ParseIntPipe) limit: number, @Query('offset', ParseIntPipe) offset: number): Promise<User[]> {
         try {
-            return this.usersService.getUsers();
+            return this.usersService.getUsers(limit, offset);
         } catch (error) {
             throw new Error(error.message);
         }
@@ -45,8 +46,9 @@ export class UserController {
      * @returns 
      */
     @Post()
-    async createUser(@Body() user: User): Promise<User> {
+    async createUser(@Body(UpperFirstPipe) user: User): Promise<User> {
         try {
+            console.debug("user after piped", user);
             const createdUser: User = await this.usersService.createUser(user)
             this.eventEmitter.emit("user.created", createdUser);
             return createdUser;
